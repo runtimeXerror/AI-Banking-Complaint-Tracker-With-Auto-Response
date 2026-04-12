@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TrustDesk — AI Complaint Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080C15;--bg2:#0E1420;--bg3:#141D2E;--bg4:#1C2840;
+  --bd:#ffffff0D;--bd2:#ffffff18;--bd3:#ffffff26;
+  --t:#DDE4F0;--t2:#7D8FA8;--t3:#3D4F68;
+  --amber:#F5A623;--amber2:#FFD080;--abg:#F5A62314;--abd:#F5A62330;
+  --teal:#06B6D4;--tbg:#06B6D414;
+  --coral:#F87171;--cbg:#F8717114;
+  --green:#34D399;--gbg:#34D39914;
+  --blue:#60A5FA;--bbg:#60A5FA14;
+  --purple:#C084FC;--pbg:#C084FC14;
+  --r:10px;--r2:14px;--r3:18px;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;font-size:14px;display:flex;height:100vh;overflow:hidden}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideR{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0)}50%{box-shadow:0 0 18px 4px rgba(245,166,35,.3)}}
+@keyframes newrow{from{background:rgba(245,166,35,.14)}to{background:transparent}}
+.au{animation:fadeUp .3s ease both}
+.ar2{animation:slideR .28s ease both}
+
+/* LOGIN */
+.login-wrap{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500}
+.login-box{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--r3);padding:40px;width:380px;box-shadow:0 32px 80px rgba(0,0,0,.8)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-icon{width:38px;height:38px;background:var(--amber);border-radius:10px;display:grid;place-items:center;animation:glow 3s infinite}
+.login-icon svg{width:20px;height:20px;fill:var(--bg)}
+.login-name{font-family:'Fraunces',serif;font-size:24px;color:var(--t)}
+.login-name em{color:var(--amber);font-style:normal}
+.login-sub{font-size:12px;color:var(--t3);margin-bottom:28px}
+.lfield{margin-bottom:16px}
+.lfield label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px;font-weight:600}
+.lfield input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--r);padding:10px 13px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s}
+.lfield input:focus{border-color:var(--abd)}
+.login-btn{width:100%;background:var(--amber);border:none;border-radius:var(--r);padding:11px;color:#090d14;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
+.login-btn:hover{background:var(--amber2)}
+.login-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:14px}
+.lerr{font-size:12px;color:var(--coral);margin-top:8px;display:none}
+
+/* SIDEBAR */
+.sb{width:228px;min-width:228px;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--bd)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:var(--amber);border-radius:10px;display:grid;place-items:center;flex-shrink:0;animation:glow 3s ease infinite}
+.logo-icon svg{width:19px;height:19px;fill:var(--bg)}
+.lname{font-family:'Fraunces',serif;font-size:21px;color:var(--t);letter-spacing:-.3px}
+.lname em{color:var(--amber);font-style:normal}
+.lsub{font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+.nav{padding:12px 8px;flex:1;overflow-y:auto}
+.nsec{font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;padding:0 10px;margin:16px 0 5px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--t2);transition:all .14s;margin-bottom:2px;user-select:none;border:1px solid transparent}
+.ni:hover{background:var(--bg3);color:var(--t)}
+.ni.on{background:var(--abg);color:var(--amber);border-color:var(--abd)}
+.ni svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;fill:none}
+.nl{flex:1;font-size:13px;font-weight:500}
+.nb{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.nb.red{background:var(--coral);color:#fff}
+.nb.amber{background:var(--amber);color:var(--bg)}
+.nb.gr{background:var(--gbg);color:var(--green);border:1px solid rgba(52,211,153,.3)}
+.kbd{font-family:'DM Mono',monospace;font-size:9px;background:var(--bg4);border:1px solid var(--bd2);border-radius:4px;padding:1px 6px;color:var(--t3)}
+.sf{padding:13px 14px;border-top:1px solid var(--bd)}
+.sf-row{display:flex;align-items:center;gap:9px}
+.av{width:34px;height:34px;border-radius:50%;background:var(--pbg);border:1.5px solid var(--purple);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--purple);flex-shrink:0}
+.ai2{flex:1;min-width:0}
+.an{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar3{font-size:11px;color:var(--t3)}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;animation:pulse 2s infinite}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 22px;gap:12px;flex-shrink:0}
+.tb-title{font-size:15px;font-weight:600;flex:1;font-family:'Fraunces',serif;letter-spacing:-.2px}
+.tb-title small{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t3);font-weight:400;margin-left:8px}
+.tb-actions{display:flex;align-items:center;gap:7px}
+.sw{position:relative;display:flex;align-items:center}
+.sw svg{position:absolute;left:10px;width:13px;height:13px;stroke:var(--t3);fill:none;pointer-events:none}
+.sw input{background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--r);padding:7px 38px 7px 30px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;width:210px;outline:none;transition:border .2s,width .2s}
+.sw input:focus{border-color:var(--abd);width:270px}
+.sw input::placeholder{color:var(--t3)}
+.sw-k{position:absolute;right:9px;font-family:'DM Mono',monospace;font-size:9px;background:var(--bg4);border:1px solid var(--bd2);border-radius:4px;padding:1px 5px;color:var(--t3);pointer-events:none}
+.btn{padding:7px 13px;border-radius:var(--r);border:1px solid var(--bd2);background:transparent;color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:hover{background:var(--bg3);color:var(--t);border-color:var(--bd3)}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.btn.pri{background:var(--amber);border-color:var(--amber);color:#090d14;font-weight:700}
+.btn.pri:hover{background:var(--amber2);transform:translateY(-1px)}
+.btn.ok{border-color:rgba(52,211,153,.3);color:var(--green)}.btn.ok:hover{background:var(--gbg)}
+.btn.bad{border-color:rgba(248,113,113,.3);color:var(--coral)}.btn.bad:hover{background:var(--cbg)}
+.live-pill{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);padding:5px 11px;border-radius:20px;background:var(--gbg);border:1px solid rgba(52,211,153,.3)}
+.ld{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.4s ease infinite}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:20px 22px}
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
+.sc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:17px 19px;position:relative;overflow:hidden;transition:border .2s,transform .18s,box-shadow .2s}
+.sc:hover{border-color:var(--bd3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.sc-acc{position:absolute;top:0;left:0;right:0;height:2px}
+.sc-ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:10px;display:grid;place-items:center;opacity:.85}
+.sc-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;font-weight:600}
+.sc-val{font-size:30px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;letter-spacing:-1px}
+.sc-d{font-size:11px;margin-top:7px;display:flex;align-items:center;gap:4px;font-weight:500}
+
+/* PANELS */
+.panel{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden}
+.phd{display:flex;align-items:center;justify-content:space-between;padding:14px 17px;border-bottom:1px solid var(--bd)}
+.phd h3{font-size:13px;font-weight:600;color:var(--t)}
+.phd-r{display:flex;align-items:center;gap:5px}
+.chip{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;color:var(--t3);border:1px solid var(--bd);transition:all .14s}
+.chip:hover{color:var(--t)}
+.chip.on{background:var(--abg);color:var(--amber);border-color:var(--abd)}
+.g2{display:grid;grid-template-columns:1fr 330px;gap:14px;margin-bottom:14px}
+
+/* COMPLAINT LAYOUT */
+.cl-layout{display:grid;grid-template-columns:1fr 430px;height:calc(100vh - 54px);overflow:hidden}
+.lp{display:flex;flex-direction:column;border-right:1px solid var(--bd);overflow:hidden}
+.fbar{display:flex;align-items:center;gap:3px;padding:10px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto;background:var(--bg2)}
+.fbar::-webkit-scrollbar{display:none}
+.ft{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;color:var(--t3);transition:all .14s;white-space:nowrap;border:1px solid transparent}
+.ft:hover{color:var(--t);background:var(--bg3)}
+.ft.on{color:var(--amber);background:var(--abg);border-color:var(--abd)}
+.fc{margin-left:3px;font-size:10px;opacity:.55}
+.fsp{flex:1}
+.ls{flex:1;overflow-y:auto}
+.ls::-webkit-scrollbar{width:3px}
+.ls::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+.crow{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;position:relative}
+.crow:hover{background:var(--bg3)}
+.crow.sel{background:var(--abg);border-left:2px solid var(--amber);padding-left:12px}
+.crow.nr{animation:newrow .9s ease forwards}
+.cav{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+.cb{flex:1;min-width:0}
+.ct{display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-wrap:wrap}
+.cn{font-size:13px;font-weight:600}
+.cid2{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3)}
+.cx{font-size:12.5px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px}
+.cm{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.badge{padding:2px 8px;border-radius:5px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.b-critical{background:var(--coral);color:#fff}
+.b-high{background:var(--cbg);color:var(--coral);border:1px solid rgba(248,113,113,.2)}
+.b-medium{background:var(--abg);color:var(--amber);border:1px solid rgba(245,166,35,.2)}
+.b-low{background:var(--gbg);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.b-open{background:var(--bbg);color:var(--blue)}
+.b-pending{background:var(--abg);color:var(--amber)}
+.b-resolved{background:var(--gbg);color:var(--green)}
+.tag{padding:2px 8px;border-radius:5px;font-size:10px;color:var(--t3);background:var(--bg4);border:1px solid var(--bd)}
+.cr{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.sp{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.sp.u{background:var(--cbg);color:var(--coral);border:1px solid rgba(248,113,113,.3);animation:pulse 1.2s ease infinite}
+.sp.w{background:var(--abg);color:var(--amber);border:1px solid rgba(245,166,35,.3)}
+.sp.ok{color:var(--t3);background:var(--bg4)}
+.sp.dn{color:var(--green);background:var(--gbg)}
+.sage{font-size:10px;color:var(--t3)}
+.sbar{height:3px;width:58px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.sbf{height:100%;border-radius:2px}
+
+/* DETAIL */
+.dp{display:flex;flex-direction:column;overflow:hidden;height:100%;background:var(--bg2)}
+.de{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3);gap:10px}
+.de svg{width:44px;height:44px;stroke:currentColor;opacity:.2;fill:none}
+.de p{font-size:13px;font-weight:500}
+.de small{font-size:11px;color:var(--t3)}
+.di{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.dtop{padding:17px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.dcid{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-bottom:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dq{font-size:14px;font-weight:600;line-height:1.5;margin-bottom:10px;color:var(--t)}
+.dbd{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dgl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.dgv{font-size:12.5px;color:var(--t);font-weight:500}
+.dtabs{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--bg3)}
+.dtab{padding:11px 15px;font-size:12px;font-weight:500;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;transition:all .14s}
+.dtab:hover{color:var(--t)}
+.dtab.on{color:var(--amber);border-bottom-color:var(--amber)}
+.dbody{flex:1;overflow-y:auto;padding:15px}
+.dbody::-webkit-scrollbar{width:3px}
+.dbody::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* HISTORY */
+.hi{display:flex;gap:10px;margin-bottom:14px}
+.hdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.hb{flex:1}
+.hw{font-size:11px;font-weight:700;margin-bottom:2px;color:var(--t)}
+.hm{font-size:12.5px;color:var(--t2);line-height:1.6}
+.ht{font-size:10px;color:var(--t3);margin-top:3px}
+
+/* AUTO DRAFT BANNER */
+.auto-draft-banner{background:var(--gbg);border:1px solid rgba(52,211,153,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.adb-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.adb-icon{font-size:14px}
+.adb-title{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em}
+.adb-body{font-size:11.5px;color:var(--t2);line-height:1.65;white-space:pre-wrap;font-family:'DM Mono',monospace}
+
+/* AI BOX */
+.aibox{background:var(--bg3);border:1px solid var(--abd);border-radius:var(--r);padding:14px}
+.aihd{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.aihd svg{width:14px;height:14px;fill:var(--amber)}
+.aihd span{font-size:11px;color:var(--amber);font-weight:700}
+.aiconf{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);background:var(--gbg);padding:2px 8px;border-radius:10px;border:1px solid rgba(52,211,153,.2)}
+.tones{display:flex;gap:4px;margin:8px 0}
+.tc2{padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;color:var(--t3);border:1px solid var(--bd);transition:all .14s}
+.tc2:hover{color:var(--t)}
+.tc2.on{background:var(--abg);color:var(--amber);border-color:var(--abd)}
+.ait{font-size:12.5px;color:var(--t2);line-height:1.7;min-height:56px}
+.cursor{display:inline-block;width:2px;height:12px;background:var(--amber);margin-left:1px;animation:blink 1s step-end infinite;vertical-align:middle}
+.aiac{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.aiac .btn{font-size:12px;padding:6px 11px}
+
+/* FOOTER */
+.dfoot{padding:12px 14px;border-top:1px solid var(--bd);flex-shrink:0;background:var(--bg3)}
+.comp{display:flex;gap:7px;align-items:flex-end}
+.comp textarea{flex:1;background:var(--bg4);border:1px solid var(--bd2);border-radius:var(--r);padding:9px 12px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;resize:none;outline:none;height:60px;transition:border .2s;line-height:1.5}
+.comp textarea:focus{border-color:var(--abd)}
+.compac{display:flex;flex-direction:column;gap:4px}
+.ib{width:29px;height:29px;border-radius:7px;border:1px solid var(--bd2);background:transparent;cursor:pointer;display:grid;place-items:center;transition:all .14s;color:var(--t2)}
+.ib:hover{background:var(--bg3);color:var(--t)}
+.ib svg{width:12px;height:12px;stroke:currentColor;fill:none}
+.acts{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.acts .btn{font-size:12px;padding:6px 10px;flex:1}
+
+/* NEW COMPLAINT MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-ov.open{display:flex;animation:fadeUp .2s ease}
+.modal-box{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--r3);width:520px;padding:28px;box-shadow:0 32px 80px rgba(0,0,0,.8);max-height:90vh;overflow-y:auto}
+.modal-box h2{font-family:'Fraunces',serif;font-size:20px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--t3);margin-bottom:22px}
+.mfield{margin-bottom:14px}
+.mfield label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:5px;font-weight:600}
+.mfield input,.mfield select,.mfield textarea{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--r);padding:9px 12px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border .2s}
+.mfield input:focus,.mfield select:focus,.mfield textarea:focus{border-color:var(--abd)}
+.mfield select option{background:var(--bg3)}
+.mfield textarea{resize:vertical;min-height:90px;line-height:1.5}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn{flex:1;justify-content:center;padding:10px}
+
+/* AUTO DRAFT PREVIEW */
+.draft-preview{background:var(--bg3);border:1px solid rgba(52,211,153,.3);border-radius:var(--r);padding:16px;margin-top:18px;display:none}
+.dp-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dp-icon{width:26px;height:26px;border-radius:7px;background:var(--gbg);display:grid;place-items:center;font-size:13px}
+.dp-title{font-size:12px;font-weight:700;color:var(--green)}
+.dp-ticket{font-family:'DM Mono',monospace;font-size:11px;color:var(--amber);background:var(--abg);padding:2px 8px;border-radius:5px;margin-left:auto}
+.dp-body{font-size:11.5px;color:var(--t2);line-height:1.7;white-space:pre-wrap;font-family:'DM Mono',monospace}
+
+/* INSIGHT CARDS */
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.iec{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:15px 17px;transition:all .2s;cursor:pointer}
+.iec:hover{border-color:var(--bd3);transform:translateY(-2px)}
+.iec-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.iec-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:15px;flex-shrink:0}
+.iec-title{font-size:12px;font-weight:700;color:var(--t)}
+.iec-count{font-size:11px;color:var(--t3);margin-bottom:6px}
+.iec-bar{height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;margin-bottom:7px}
+.iec-fill{height:100%;border-radius:2px}
+.iec-trend{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.iec-kws{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.iec-kw{font-size:9px;padding:2px 7px;border-radius:4px;background:var(--bg4);color:var(--t3);border:1px solid var(--bd)}
+
+/* ANALYTICS */
+.ag3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.a2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.ms{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:16px 18px}
+.ms-l{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-weight:600}
+.ms-v{font-size:24px;font-weight:700;font-family:'DM Mono',monospace}
+.tr-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.tr-row:last-child{border:none}
+.trk{font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);width:20px;flex-shrink:0}
+.trn{font-size:12.5px;margin-bottom:4px;font-weight:500}
+.trb{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;width:100%}
+.trf{height:3px;border-radius:2px;background:var(--amber)}
+.trc{font-family:'DM Mono',monospace;font-size:12px;color:var(--amber);min-width:34px;text-align:right}
+
+/* CMD PALETTE */
+.cmd-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:flex-start;justify-content:center;padding-top:100px;backdrop-filter:blur(4px)}
+.cmd-ov.open{display:flex;animation:fadeUp .15s ease}
+.cmd-box{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--r3);width:540px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.85)}
+.cmd-inp{display:flex;align-items:center;gap:9px;padding:14px 16px;border-bottom:1px solid var(--bd)}
+.cmd-inp svg{width:16px;height:16px;stroke:var(--t3);fill:none;flex-shrink:0}
+.cmd-inp input{flex:1;background:none;border:none;outline:none;color:var(--t);font-size:14px;font-family:'DM Sans',sans-serif}
+.cmd-inp input::placeholder{color:var(--t3)}
+.cmd-list{max-height:330px;overflow-y:auto;padding:6px}
+.cmd-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .1s}
+.cmd-item:hover,.cmd-item.hi{background:var(--bg3)}
+.cii{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex-shrink:0}
+.cii svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.cib{flex:1}
+.cib-l{font-size:13px;font-weight:600}
+.cib-s{font-size:11px;color:var(--t3)}
+.cik{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);background:var(--bg4);border:1px solid var(--bd2);border-radius:4px;padding:1px 6px}
+.cmd-sec{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:9px 12px 3px;font-weight:600}
+
+/* TOASTS */
+.ts-stack{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:7px;z-index:999}
+.toast{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--r);padding:12px 15px;min-width:240px;max-width:300px;transform:translateX(110%);opacity:0;transition:all .32s cubic-bezier(.34,1.56,.64,1)}
+.toast.in{transform:translateX(0);opacity:1}
+.toast.out{transform:translateX(110%);opacity:0;transition:all .2s ease}
+.tt{font-weight:700;font-size:11px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em}
+.toast.ta .tt{color:var(--amber)}
+.toast.tg .tt{color:var(--green)}
+.toast.tc .tt{color:var(--coral)}
+.toast.tb .tt{color:var(--blue)}
+.tm{font-size:12px;color:var(--t2)}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--bd2);border-top-color:var(--amber);border-radius:50%;animation:spin .55s linear infinite}
+.view{display:none}
+.view.on{display:block}
+.empty{padding:40px 20px;text-align:center;color:var(--t3);font-size:13px}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.sec-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:10px;color:var(--t3);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div class="login-name">Trust<em>Desk</em></div>
+    </div>
+    <div class="login-sub">AI Complaint Intelligence · State Bank of India</div>
+    <div class="lfield"><label>Email</label><input type="email" id="lemail" placeholder="arjun@sbi.com" value="arjun@sbi.com"/></div>
+    <div class="lfield"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" value="password"/></div>
+    <div class="lerr" id="lerr">Invalid email or password</div>
+    <button class="login-btn" onclick="doLogin()">Sign in to TrustDesk</button>
+    <div class="login-hint">Demo: arjun@sbi.com / password</div>
+  </div>
+</div>
+
+<!-- CMD PALETTE -->
+<div class="cmd-ov" id="cmd" onclick="if(event.target===this)closeCmd()">
+  <div class="cmd-box">
+    <div class="cmd-inp">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="cInput" placeholder="Search complaints, navigate, run actions…" oninput="cSearch()" onkeydown="cKey(event)" autocomplete="off"/>
+    </div>
+    <div class="cmd-list" id="cList"></div>
+  </div>
+</div>
+
+<!-- NEW COMPLAINT MODAL -->
+<div class="modal-ov" id="ncModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <h2>New Complaint</h2>
+    <div class="modal-sub">Register a new customer complaint — auto-acknowledgement will be sent instantly</div>
+    <div class="mgrid">
+      <div class="mfield"><label>Customer Name</label><input id="nc-name" placeholder="Ramesh Verma"/></div>
+      <div class="mfield"><label>Phone / Email</label><input id="nc-contact" placeholder="9876543210"/></div>
+    </div>
+    <div class="mgrid">
+      <div class="mfield"><label>Channel</label>
+        <select id="nc-channel">
+          <option>Mobile App</option><option>Branch</option><option>Email</option>
+          <option>IVR</option><option>WhatsApp</option><option>SMS</option><option>Social</option>
+        </select>
+      </div>
+      <div class="mfield"><label>Product</label>
+        <select id="nc-product">
+          <option>UPI Transfer</option><option>Home Loan EMI</option><option>Debit Card</option>
+          <option>Fixed Deposit</option><option>Internet Banking</option><option>ATM</option>
+          <option>KYC Update</option><option>NEFT/RTGS</option><option>Credit Card</option><option>General</option>
+        </select>
+      </div>
+    </div>
+    <div class="mfield"><label>Complaint Description</label><textarea id="nc-issue" placeholder="Describe the customer's issue in detail…"></textarea></div>
+    <!-- Auto-draft preview -->
+    <div class="draft-preview" id="draftPreview">
+      <div class="dp-head">
+        <div class="dp-icon">✅</div>
+        <div class="dp-title">Auto-acknowledgement ready</div>
+        <div class="dp-ticket" id="dp-ticket">TD-XXXX-XXXX</div>
+      </div>
+      <div class="dp-body" id="dp-body"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="previewDraft()">👁 Preview Draft</button>
+      <button class="btn pri" onclick="submitComplaint()">Submit & Send Draft</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="ts-stack" id="ts"></div>
+
+<!-- APP (hidden until login) -->
+<div id="appWrap" style="display:none;width:100%;height:100%;display:none;flex">
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div><div class="lname">Trust<em>Desk</em></div><div class="lsub">AI Complaint Intelligence</div></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nsec">Workspace</div>
+    <div class="ni on" id="n-dash" onclick="go('dash',this)">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span class="nl">Overview</span><span class="kbd">G+O</span>
+    </div>
+    <div class="ni" id="n-comp" onclick="go('comp',this)">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span class="nl">Complaints</span><span class="nb red" id="ob">—</span>
+    </div>
+    <div class="ni" id="n-ana" onclick="go('ana',this)">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="nl">Analytics</span>
+    </div>
+    <div class="ni" id="n-ins" onclick="go('ins',this)">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span class="nl">Insight Engine</span><span class="nb amber">AI</span>
+    </div>
+    <div class="nsec">Tools</div>
+    <div class="ni" onclick="toast('Escalations','3 complaints awaiting senior review','c')">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+      <span class="nl">Escalations</span><span class="nb red">3</span>
+    </div>
+    <div class="ni" onclick="toast('Reports','RBI export ready','b')">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="nl">RBI Reports</span><span class="nb gr">New</span>
+    </div>
+    <div class="ni" onclick="openCmd()">
+      <svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="nl">Quick Search</span><span class="kbd">⌘K</span>
+    </div>
+  </nav>
+  <div class="sf">
+    <div class="sf-row">
+      <div class="av" id="sav">AK</div>
+      <div class="ai2"><div class="an" id="sagent">Loading…</div><div class="ar3" id="srole">Agent</div></div>
+      <div class="sdot"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="tb-title" id="pt">Overview <small>Today's snapshot</small></div>
+    <div class="tb-actions">
+      <div class="live-pill"><div class="ld"></div>Live</div>
+      <div class="sw">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="gs" placeholder="Search complaints…" oninput="filterC()" onclick="openCmd()"/>
+        <span class="sw-k">⌘K</span>
+      </div>
+      <button class="btn" onclick="loadAll()">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-5.36L1 10"/></svg>
+        Refresh
+      </button>
+      <button class="btn pri" onclick="openModal()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Complaint
+      </button>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <div class="view on content" id="v-dash">
+    <div class="sgrid" id="sgrid"><div class="loading"><span class="spin"></span> Loading stats…</div></div>
+    <div class="g2">
+      <div class="panel au" style="animation-delay:.05s">
+        <div class="phd"><h3>Complaint volume</h3>
+          <div class="phd-r">
+            <span class="chip on" onclick="switchPeriod(7,this)">7D</span>
+            <span class="chip" onclick="switchPeriod(14,this)">14D</span>
+          </div>
+        </div>
+        <div style="padding:16px"><div style="position:relative;height:175px"><canvas id="volChart"></canvas></div></div>
+      </div>
+      <div class="panel au" style="animation-delay:.1s">
+        <div class="phd"><h3>By category</h3></div>
+        <div style="padding:16px">
+          <div style="position:relative;height:128px"><canvas id="catChart"></canvas></div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px" id="catLegend"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel au" style="animation-delay:.12s;margin-bottom:14px">
+      <div class="phd"><h3>Sentiment trend — last 7 days</h3><span style="font-size:11px;color:var(--t3)">NLP powered</span></div>
+      <div style="padding:16px"><div style="position:relative;height:150px"><canvas id="sentChart"></canvas></div></div>
+    </div>
+    <div class="panel au" style="animation-delay:.15s">
+      <div class="phd"><h3>Recent activity</h3>
+        <button class="btn" style="font-size:12px;padding:4px 9px" onclick="go('comp',document.getElementById('n-comp'))">View all →</button>
+      </div>
+      <div id="recentList"><div class="loading"><span class="spin"></span></div></div>
+    </div>
+  </div>
+
+  <!-- COMPLAINTS -->
+  <div class="view" id="v-comp">
+    <div class="cl-layout">
+      <div class="lp">
+        <div class="fbar">
+          <span class="ft on" onclick="sf2('all',this)">All <span class="fc" id="fa"></span></span>
+          <span class="ft" onclick="sf2('open',this)">Open <span class="fc" id="fo"></span></span>
+          <span class="ft" onclick="sf2('pending',this)">Pending <span class="fc" id="fp"></span></span>
+          <span class="ft" onclick="sf2('resolved',this)">Resolved <span class="fc" id="fr2"></span></span>
+          <span class="ft" onclick="sf2('critical',this)">🔴 Critical <span class="fc" id="fk"></span></span>
+          <div class="fsp"></div>
+          <span style="font-size:11px;color:var(--t3);padding:4px 9px;cursor:pointer;border-radius:6px" onclick="loadComplaints()">↻ Sync</span>
+        </div>
+        <div class="ls" id="cl2"><div class="loading"><span class="spin"></span> Loading…</div></div>
+      </div>
+      <div class="dp">
+        <div class="de" id="de">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <p>Select a complaint</p>
+          <small>Press J / K to navigate · ⌘K to search</small>
+        </div>
+        <div class="di ar2" id="din" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="view content" id="v-ana">
+    <div class="sec-hd"><div><div class="sec-title">Analytics Dashboard</div><div class="sec-sub">Real-time complaint intelligence</div></div><button class="btn" onclick="loadAnalytics()">↻ Refresh</button></div>
+    <div class="ag3" id="ag3"><div class="loading"><span class="spin"></span></div></div>
+    <div class="a2">
+      <div class="panel"><div class="phd"><h3>Sentiment breakdown</h3></div>
+        <div style="padding:16px"><div style="position:relative;height:190px"><canvas id="sc2"></canvas></div>
+        <div style="display:flex;gap:14px;margin-top:12px;justify-content:center;font-size:12px" id="sentLegend"></div></div>
+      </div>
+      <div class="panel"><div class="phd"><h3>Complaints by channel</h3></div>
+        <div style="padding:16px"><div style="position:relative;height:190px"><canvas id="chanChart"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHT ENGINE -->
+  <div class="view content" id="v-ins">
+    <div class="sec-hd">
+      <div><div class="sec-title">🧠 Insight Engine</div><div class="sec-sub">KMeans clustering · root cause detection · trend analysis</div></div>
+      <button class="btn" onclick="loadInsights()">↻ Refresh clusters</button>
+    </div>
+    <div class="insight-grid" id="insightGrid"><div class="loading" style="grid-column:1/-1"><span class="spin"></span> Clustering complaints…</div></div>
+    <div class="panel" style="margin-bottom:14px">
+      <div class="phd"><h3>Volume by category</h3></div>
+      <div id="catBars" style="padding:8px 0"></div>
+    </div>
+  </div>
+</div>
+</div><!-- /appWrap -->
+
+<script>
+const API = 'http://localhost:8000/api';
+let TOKEN = '', AGENT = {}, complaints = [], selId = null, flt = 'all', tab = 'hist';
+let volCh, catCh, sentCh, sc2Ch, chanCh;
+const gc = 'rgba(255,255,255,0.04)', tc2 = '#3D4F68';
+Chart.defaults.font.family = "'DM Sans',sans-serif";
+Chart.defaults.color = tc2;
+
+// ── AUTH ──
+async function doLogin(){
+  const email = document.getElementById('lemail').value;
+  const pass  = document.getElementById('lpass').value;
+  try {
+    const r = await fetch(`${API}/auth/login`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    if(!r.ok){ document.getElementById('lerr').style.display='block'; return; }
+    const d = await r.json();
+    TOKEN = d.access_token; AGENT = d.agent;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('appWrap').style.display   = 'flex';
+    document.getElementById('sagent').textContent = AGENT.name;
+    document.getElementById('srole').textContent  = AGENT.role + ' · ' + AGENT.branch;
+    document.getElementById('sav').textContent    = AGENT.name.split(' ').map(n=>n[0]).join('').slice(0,2);
+    loadAll();
+  } catch(e){ document.getElementById('lerr').style.display='block'; }
+}
+
+function headers(){ return {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}; }
+
+// ── LOAD ALL ──
+async function loadAll(){
+  await Promise.all([loadSummary(), loadComplaints(), buildVolChart(), buildCatChart(), buildSentChartDash()]);
+}
+
+// ── SUMMARY STATS ──
+async function loadSummary(){
+  try {
+    const d = await fetch(`${API}/analytics/summary`,{headers:headers()}).then(r=>r.json());
+    document.getElementById('sgrid').innerHTML = [
+      {l:'Total Open',     v:d.total_open,         c:'--amber', ico:'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01', bg:'var(--abg)', txt:`↑ ${d.critical_open} critical`},
+      {l:'SLA Breaching',  v:d.sla_breaching,      c:'--coral', ico:'M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zM12 8v4M12 16h.01',              bg:'var(--cbg)', txt:'needs action'},
+      {l:'Avg Resolution', v:d.avg_resolution_h+'h',c:'--teal',  ico:'M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zM12 6v6l4 2',                  bg:'var(--tbg)', txt:'avg time', nc:1},
+      {l:'Resolved Today', v:d.total_resolved,      c:'--green', ico:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',                                                    bg:'var(--gbg)', txt:d.sla_compliance_pct+'% SLA compliance'},
+    ].map((s,i)=>`
+      <div class="sc au" style="animation-delay:${i*.06}s">
+        <div class="sc-acc" style="background:var(${s.c})"></div>
+        <div class="sc-ico" style="background:${s.bg}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(${s.c})" stroke-width="1.8"><path d="${s.ico}"/></svg></div>
+        <div class="sc-lbl">${s.l}</div>
+        <div class="sc-val" style="color:var(${s.c})">${s.v}</div>
+        <div class="sc-d" style="color:var(--${s.c==='--coral'?'coral':'green'})">${s.txt}</div>
+      </div>`).join('');
+    document.getElementById('ob').textContent = d.total_open;
+  } catch(e){ console.error(e); }
+}
+
+// ── COMPLAINTS ──
+async function loadComplaints(filter=null, search=null){
+  try {
+    let url = `${API}/complaints?limit=50`;
+    if(flt==='critical')     url += '&severity=critical';
+    else if(flt==='resolved')url += '&status=resolved';
+    else if(flt==='pending') url += '&status=pending';
+    else if(flt==='open')    url += '&status=open';
+    const q = search || document.getElementById('gs')?.value;
+    if(q) url += `&search=${encodeURIComponent(q)}`;
+    const d = await fetch(url,{headers:headers()}).then(r=>r.json());
+    complaints = d.complaints || [];
+    renderList();
+    updFC();
+    // Recent list on dashboard
+    const rl = document.getElementById('recentList');
+    if(rl) rl.innerHTML = complaints.slice(0,5).map(renderMiniRow).join('') || '<div class="empty">No recent complaints</div>';
+  } catch(e){ console.error(e); }
+}
+
+function renderList(){
+  const el = document.getElementById('cl2');
+  if(!el) return;
+  if(!complaints.length){ el.innerHTML = '<div class="empty">No complaints match this filter</div>'; return; }
+  el.innerHTML = complaints.map(c=>`
+    <div class="crow${selId===c.ticket_id?' sel':''}" id="r-${c.ticket_id}" onclick="sel('${c.ticket_id}')">
+      <div class="cav" style="background:${sevBg(c.severity)};color:${sevFg(c.severity)}">${initials(c.customer_name)}</div>
+      <div class="cb">
+        <div class="ct"><span class="cn">${c.customer_name}</span><span class="cid2">${c.ticket_id}</span><span style="font-size:13px">${sentEmoji(c.sentiment)}</span></div>
+        <div class="cx">${c.issue_text}</div>
+        <div class="cm"><span class="badge b-${c.severity}">${c.severity}</span><span class="badge b-${c.status}">${c.status}</span><span class="tag">${c.product}</span><span class="tag">${c.channel}</span></div>
+      </div>
+      <div class="cr">
+        <span class="sp ${slaClass(c.sla_remaining_mins)}">${slaLabel(c.sla_remaining_mins,c.status)}</span>
+        <div class="sbar"><div class="sbf" style="width:${slaBar(c.sla_remaining_mins,c.sla_hours)}%;background:${slaColor(c.sla_remaining_mins,c.status)}"></div></div>
+        <span class="sage">${timeAgo(c.created_at)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderMiniRow(c){ return `
+  <div class="crow" onclick="go('comp',document.getElementById('n-comp'));setTimeout(()=>sel('${c.ticket_id}'),60)">
+    <div class="cav" style="background:${sevBg(c.severity)};color:${sevFg(c.severity)}">${initials(c.customer_name)}</div>
+    <div class="cb">
+      <div class="ct"><span class="cn">${c.customer_name}</span><span class="cid2">${c.ticket_id}</span></div>
+      <div class="cx">${c.issue_text}</div>
+      <div class="cm"><span class="badge b-${c.severity}">${c.severity}</span><span class="tag">${c.product}</span></div>
+    </div>
+    <div class="cr"><span class="sp ${slaClass(c.sla_remaining_mins)}">${slaLabel(c.sla_remaining_mins,c.status)}</span><span class="sage">${timeAgo(c.created_at)}</span></div>
+  </div>`; }
+
+function updFC(){
+  const all = complaints.length;
+  const open= complaints.filter(c=>c.status==='open').length;
+  const pend= complaints.filter(c=>c.status==='pending').length;
+  const res = complaints.filter(c=>c.status==='resolved').length;
+  const crit= complaints.filter(c=>c.severity==='critical').length;
+  document.getElementById('fa').textContent = all;
+  document.getElementById('fo').textContent = open;
+  document.getElementById('fp').textContent = pend;
+  document.getElementById('fr2').textContent= res;
+  document.getElementById('fk').textContent = crit;
+}
+
+function sf2(f,el){ flt=f; document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on')); el.classList.add('on'); loadComplaints(); }
+function filterC(){ loadComplaints(); }
+
+// ── DETAIL ──
+async function sel(ticket_id){
+  selId = ticket_id;
+  renderList();
+  document.getElementById('de').style.display  = 'none';
+  const din = document.getElementById('din');
+  din.style.display = 'flex'; din.className='di ar2'; void din.offsetWidth;
+  try {
+    const c = await fetch(`${API}/complaints/${ticket_id}`,{headers:headers()}).then(r=>r.json());
+    const slaRem = slaLabel(c.sla_remaining_mins, c.status);
+    din.innerHTML = `
+      <div class="dtop">
+        <div class="dcid">${c.ticket_id}<span class="tag">${c.channel}</span><span class="tag">${c.branch}</span></div>
+        <div class="dq">${c.issue_text}</div>
+        <div class="dbd">
+          <span class="badge b-${c.severity}">${c.severity}</span>
+          <span class="badge b-${c.status}">${c.status}</span>
+          <span style="padding:2px 8px;border-radius:5px;font-size:9px;font-weight:800;background:${sevBg(c.severity)};color:${sevFg(c.severity)}">${c.product}</span>
+        </div>
+        <div class="dgrid">
+          <div><div class="dgl">Customer</div><div class="dgv">${c.customer_name}</div></div>
+          <div><div class="dgl">Assigned</div><div class="dgv">${c.assigned_agent}</div></div>
+          <div><div class="dgl">Opened</div><div class="dgv">${timeAgo(c.created_at)}</div></div>
+          <div><div class="dgl">SLA</div><div class="dgv sp ${slaClass(c.sla_remaining_mins)}" style="display:inline-block">${slaRem}</div></div>
+        </div>
+      </div>
+      <div class="dtabs">
+        <div class="dtab on" id="dt-hist" onclick="showTab('hist','${c.ticket_id}')">Activity</div>
+        <div class="dtab" id="dt-auto" onclick="showTab('auto','${c.ticket_id}')">Auto Draft</div>
+        <div class="dtab" id="dt-ai" onclick="showTab('ai','${c.ticket_id}')">AI Response</div>
+        <div class="dtab" id="dt-inf" onclick="showTab('inf','${c.ticket_id}')">Details</div>
+      </div>
+      <div class="dbody" id="dbody"></div>
+      <div class="dfoot">
+        <div class="comp">
+          <textarea placeholder="Add note or response…" id="ca"></textarea>
+          <div class="compac">
+            <button class="ib" onclick="toast('Attach','Upload coming soon','b')"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+            <button class="ib btn pri" style="width:29px;height:29px;border-radius:7px" onclick="addNote('${c.ticket_id}')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+        <div class="acts">
+          <button class="btn ok" onclick="resolveC('${c.ticket_id}')">✓ Resolve</button>
+          <button class="btn bad" onclick="escalateC('${c.ticket_id}')">↑ Escalate</button>
+          <button class="btn" onclick="toast('Reassigned','Moved to queue','b')">↻ Reassign</button>
+        </div>
+      </div>`;
+    tab = 'hist';
+    showTabContent(c);
+  } catch(e){ console.error(e); }
+}
+
+async function showTab(t, ticket_id){
+  tab = t;
+  document.querySelectorAll('.dtab').forEach(x=>x.classList.remove('on'));
+  document.getElementById('dt-'+t)?.classList.add('on');
+  try {
+    const c = await fetch(`${API}/complaints/${ticket_id}`,{headers:headers()}).then(r=>r.json());
+    showTabContent(c);
+  } catch(e){}
+}
+
+function showTabContent(c){
+  const b = document.getElementById('dbody');
+  if(!b) return;
+  if(tab==='hist'){
+    const notes = c.notes || [];
+    const sysNotes = [
+      {agent:'System',    message:`Auto-logged from ${c.channel}. Category: ${c.product}. Severity: ${c.severity}.`, time: c.created_at, color:'#3D4F68'},
+      {agent:'TrustDesk AI', message:`Sentiment: ${c.sentiment} (${(c.sentiment_score*100).toFixed(0)}%). Priority score: ${c.priority_score.toFixed(0)}/100. SLA: ${c.sla_hours}h.`, time: c.created_at, color:'#F5A623'},
+      ...notes.map(n=>({agent:n.agent,message:n.message,time:n.time,color:'#60A5FA'}))
+    ];
+    b.innerHTML = sysNotes.map(h=>`<div class="hi"><div><div class="hdot" style="background:${h.color}"></div></div><div class="hb"><div class="hw">${h.agent}</div><div class="hm">${h.message}</div><div class="ht">${timeAgo(h.time)}</div></div></div>`).join('') || '<div class="empty">No activity</div>';
+  } else if(tab==='auto'){
+    b.innerHTML = c.auto_draft_text ? `
+      <div class="auto-draft-banner">
+        <div class="adb-head"><div class="adb-icon">✅</div><div class="adb-title">Auto-acknowledgement sent · ${c.ticket_id}</div></div>
+        <div class="adb-body">${c.auto_draft_text}</div>
+      </div>` : '<div class="empty">No auto draft available</div>';
+  } else if(tab==='ai'){
+    b.innerHTML = `
+      <div class="aibox">
+        <div class="aihd"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>TrustDesk AI Draft</span><span class="aiconf">Claude powered</span></div>
+        <div class="tones">
+          <span class="tc2 on" onclick="regen('${c.ticket_id}','formal',this)">Formal</span>
+          <span class="tc2" onclick="regen('${c.ticket_id}','empathetic',this)">Empathetic</span>
+          <span class="tc2" onclick="regen('${c.ticket_id}','brief',this)">Brief</span>
+        </div>
+        <div class="ait" id="ait">${c.ai_draft || '<span class="spin"></span>'}</div>
+        <div class="aiac">
+          <button class="btn pri" onclick="toast('Sent ✓','Response sent via '+${JSON.stringify(c.channel)},'g')">Send response</button>
+          <button class="btn" onclick="navigator.clipboard?.writeText(document.getElementById('ait').textContent);toast('Copied','Draft copied','a')">Copy</button>
+          <button class="btn" onclick="regen('${c.ticket_id}','formal',document.querySelector('.tc2.on'))">Regenerate</button>
+        </div>
+      </div>`;
+  } else {
+    b.innerHTML = `<div style="display:flex;flex-direction:column;gap:2px">${[
+      ['Ticket ID',c.ticket_id],['Customer',c.customer_name],['Phone',c.customer_phone||'—'],
+      ['Email',c.customer_email||'—'],['Product',c.product],['Channel',c.channel],
+      ['Branch',c.branch],['Assigned',c.assigned_agent],['Severity',c.severity],
+      ['Status',c.status],['Priority Score',c.priority_score.toFixed(0)+'/100'],['SLA',c.sla_hours+'h'],
+    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:9px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--t3);font-weight:500">${l}</span><span style="font-weight:600">${v}</span></div>`).join('')}</div>`;
+  }
+}
+
+async function regen(ticket_id, tone, el){
+  document.querySelectorAll('.tc2').forEach(x=>x.classList.remove('on')); el?.classList.add('on');
+  const c   = complaints.find(x=>x.ticket_id===ticket_id) || await fetch(`${API}/complaints/${ticket_id}`,{headers:headers()}).then(r=>r.json());
+  const ait = document.getElementById('ait');
+  if(ait) ait.innerHTML = '<span class="spin"></span>';
+  try {
+    const d = await fetch(`${API}/ai/draft`,{method:'POST',headers:headers(),body:JSON.stringify({ticket_id,issue_text:c.issue_text,customer:c.customer_name,product:c.product,severity:c.severity,tone})}).then(r=>r.json());
+    if(ait){ ait.textContent=''; typeW(d.draft, ait, 12); }
+    toast('AI Draft','New response ready','a');
+  } catch(e){ if(ait) ait.textContent='Error generating draft. Check API key.'; }
+}
+
+async function resolveC(ticket_id){
+  try {
+    await fetch(`${API}/complaints/${ticket_id}/resolve`,{method:'POST',headers:headers()});
+    toast('Resolved ✓','Complaint marked resolved','g');
+    await loadComplaints(); await loadSummary(); sel(ticket_id);
+  } catch(e){}
+}
+
+async function escalateC(ticket_id){
+  try {
+    await fetch(`${API}/complaints/${ticket_id}/escalate`,{method:'POST',headers:headers()});
+    toast('Escalated','Sent to supervisor','c');
+    await loadComplaints(); sel(ticket_id);
+  } catch(e){}
+}
+
+async function addNote(ticket_id){
+  const v = document.getElementById('ca')?.value.trim();
+  if(!v){ toast('Empty note','Type a message first','a'); return; }
+  try {
+    await fetch(`${API}/complaints/${ticket_id}/notes`,{method:'POST',headers:headers(),body:JSON.stringify({agent:AGENT.name,message:v})});
+    document.getElementById('ca').value='';
+    toast('Note saved','Internal note added','b');
+    sel(ticket_id);
+  } catch(e){}
+}
+
+// ── NEW COMPLAINT MODAL ──
+function openModal(){ document.getElementById('ncModal').classList.add('open'); document.getElementById('draftPreview').style.display='none'; }
+function closeModal(){ document.getElementById('ncModal').classList.remove('open'); }
+
+function previewDraft(){
+  const name    = document.getElementById('nc-name').value    || 'Customer';
+  const product = document.getElementById('nc-product').value || 'General';
+  const channel = document.getElementById('nc-channel').value || 'Branch';
+  const ticket  = 'TD-' + new Date().getFullYear() + '-XXXX';
+  const draft   = generateLocalDraft(ticket, name, product, channel);
+  document.getElementById('dp-ticket').textContent = ticket;
+  document.getElementById('dp-body').textContent   = draft;
+  document.getElementById('draftPreview').style.display = 'block';
+}
+
+function generateLocalDraft(ticket, name, product, channel){
+  const first = name.split(' ')[0];
+  return `Dear ${first},\n\nThank you for reaching out to TrustDesk — State Bank of India's AI-powered grievance centre.\n\nYour complaint has been successfully registered.\n\n━━━━━━━━━━━━━━━━━━━━\n TICKET ID : ${ticket}\n Product   : ${product}\n Channel   : ${channel}\n Received  : ${new Date().toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}\n━━━━━━━━━━━━━━━━━━━━\n\nA dedicated member of our team has been assigned to your case and will reach out to you shortly. We take every complaint seriously and assure you that your issue is being prioritised.\n\nYou can track your complaint using your Ticket ID on our portal.\n\nWarm regards,\nTrustDesk Support Team\nState Bank of India`;
+}
+
+async function submitComplaint(){
+  const name    = document.getElementById('nc-name').value.trim();
+  const contact = document.getElementById('nc-contact').value.trim();
+  const channel = document.getElementById('nc-channel').value;
+  const product = document.getElementById('nc-product').value;
+  const issue   = document.getElementById('nc-issue').value.trim();
+  if(!name || !issue){ toast('Required fields','Fill name and complaint description','c'); return; }
+  try {
+    const isPhone = /^\d{10}$/.test(contact);
+    const body = {customer_name:name,customer_phone:isPhone?contact:'',customer_email:!isPhone?contact:'',channel,product,issue_text:issue};
+    const d = await fetch(`${API}/complaints`,{method:'POST',headers:headers(),body:JSON.stringify(body)}).then(r=>r.json());
+    closeModal();
+    // Show auto-draft in a toast
+    toast('✅ Complaint Registered',`Ticket: ${d.complaint.ticket_id} · Auto-draft sent`,'g');
+    // Show the full draft
+    setTimeout(()=> toast('📧 Auto-Draft Sent',`"Dear ${name.split(' ')[0]}, your complaint ${d.complaint.ticket_id} has been received…"`,'b'), 800);
+    // Clear form
+    ['nc-name','nc-contact','nc-issue'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    // Animate new row
+    await loadComplaints(); await loadSummary();
+    const el = document.getElementById('r-'+d.complaint.ticket_id);
+    if(el){ el.classList.add('nr'); setTimeout(()=>el.classList.remove('nr'),900); }
+    go('comp', document.getElementById('n-comp'));
+    setTimeout(()=>sel(d.complaint.ticket_id), 100);
+  } catch(e){ toast('Error',e.message,'c'); }
+}
+
+// ── CHARTS ──
+async function buildVolChart(){
+  try {
+    const d = await fetch(`${API}/analytics/volume-trend`,{headers:headers()}).then(r=>r.json());
+    const labels = d.trend.map(x=>x.day);
+    const data   = d.trend.map(x=>x.count);
+    if(volCh) volCh.destroy();
+    volCh = new Chart(document.getElementById('volChart'),{type:'line',data:{labels,datasets:[{data,borderColor:'#F5A623',backgroundColor:'rgba(245,166,35,0.06)',tension:.45,fill:true,pointRadius:4,pointBackgroundColor:'#F5A623',pointBorderColor:'var(--bg2)',pointBorderWidth:2,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2840',borderColor:'#ffffff18',borderWidth:1}},scales:{x:{ticks:{color:tc2,font:{size:11}},grid:{display:false},border:{display:false}},y:{ticks:{color:tc2,font:{size:11,family:'DM Mono'},callback:v=>Math.round(v)},grid:{color:gc},border:{display:false}}}}});
+  } catch(e){}
+}
+
+async function buildCatChart(){
+  try {
+    const d = await fetch(`${API}/analytics/by-category`,{headers:headers()}).then(r=>r.json());
+    const cats   = d.categories.slice(0,6);
+    const COLORS = ['#F5A623','#06B6D4','#F87171','#C084FC','#60A5FA','#34D399'];
+    if(catCh) catCh.destroy();
+    catCh = new Chart(document.getElementById('catChart'),{type:'doughnut',data:{labels:cats.map(x=>x.name),datasets:[{data:cats.map(x=>x.count),backgroundColor:COLORS.slice(0,cats.length),borderWidth:0,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2840',borderColor:'#ffffff18',borderWidth:1}}}});
+    document.getElementById('catLegend').innerHTML = cats.map((c,i)=>`<div style="display:flex;justify-content:space-between;font-size:12px;align-items:center"><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${COLORS[i]};display:inline-block"></span><span style="color:var(--t2)">${c.name}</span></span><span style="font-family:'DM Mono',monospace;color:${COLORS[i]};font-weight:600">${c.count}</span></div>`).join('');
+  } catch(e){}
+}
+
+async function buildSentChartDash(){
+  try {
+    const d = await fetch(`${API}/analytics/by-sentiment`,{headers:headers()}).then(r=>r.json());
+    const s = d.sentiments;
+    const total = (s.angry||0) + (s.neutral||0) + (s.satisfied||0) || 1;
+    // Build fake 7-day trend from totals
+    const neg=[]; const pos=[]; const neu=[];
+    for(let i=0;i<7;i++){ neg.push(Math.round(s.angry*(0.8+Math.random()*.4)/7)); pos.push(Math.round(s.satisfied*(0.8+Math.random()*.4)/7)); neu.push(Math.round(s.neutral*(0.8+Math.random()*.4)/7)); }
+    if(sentCh) sentCh.destroy();
+    sentCh = new Chart(document.getElementById('sentChart'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Today'],datasets:[
+      {label:'Negative', data:neg, borderColor:'#F87171',backgroundColor:'rgba(248,113,113,0.06)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#F87171',borderWidth:2},
+      {label:'Positive', data:pos, borderColor:'#34D399',backgroundColor:'rgba(52,211,153,0.06)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#34D399',borderWidth:2},
+      {label:'Neutral',  data:neu, borderColor:'#3D4F68',backgroundColor:'rgba(61,79,104,0.06)', fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#3D4F68',borderWidth:2},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,padding:12,color:'#7D8FA8',font:{size:11}}},tooltip:{backgroundColor:'#1C2840',borderColor:'#ffffff18',borderWidth:1}},scales:{x:{ticks:{color:tc2,font:{size:11}},grid:{display:false},border:{display:false}},y:{ticks:{color:tc2,font:{size:11,family:'DM Mono'}},grid:{color:gc},border:{display:false},beginAtZero:true}}}});
+  } catch(e){}
+}
+
+function switchPeriod(d, el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on');
+  buildVolChart();
+}
+
+// ── ANALYTICS PAGE ──
+async function loadAnalytics(){
+  try {
+    const [sum, sent, chan] = await Promise.all([
+      fetch(`${API}/analytics/summary`,{headers:headers()}).then(r=>r.json()),
+      fetch(`${API}/analytics/by-sentiment`,{headers:headers()}).then(r=>r.json()),
+      fetch(`${API}/analytics/by-channel`,{headers:headers()}).then(r=>r.json()),
+    ]);
+    document.getElementById('ag3').innerHTML = [
+      ['NPS Score',          '62',              '--teal'],
+      ['CSAT Rating',        '84%',             '--green'],
+      ['First Contact Res.', sum.sla_compliance_pct+'%','--amber'],
+    ].map(([l,v,c])=>`<div class="ms"><div class="ms-l">${l}</div><div class="ms-v" style="color:var(${c})">${v}</div></div>`).join('');
+    // Sentiment donut
+    const s = sent.sentiments;
+    if(sc2Ch) sc2Ch.destroy();
+    sc2Ch = new Chart(document.getElementById('sc2'),{type:'doughnut',data:{labels:['Angry','Neutral','Satisfied'],datasets:[{data:[s.angry||0,s.neutral||0,s.satisfied||0],backgroundColor:['#F87171','#3D4F68','#34D399'],borderWidth:0,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2840',borderColor:'#ffffff18',borderWidth:1}}}});
+    document.getElementById('sentLegend').innerHTML = [['#F87171','Angry',s.angry||0],['#3D4F68','Neutral',s.neutral||0],['#34D399','Satisfied',s.satisfied||0]].map(([c,l,v])=>`<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:${c};display:inline-block"></span><span style="color:var(--t2);font-size:12px">${l} ${v}</span></span>`).join('');
+    // Channel bar
+    const chans = chan.channels.slice(0,6);
+    if(chanCh) chanCh.destroy();
+    chanCh = new Chart(document.getElementById('chanChart'),{type:'bar',data:{labels:chans.map(x=>x.name),datasets:[{data:chans.map(x=>x.count),backgroundColor:'#06B6D4',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc2,font:{size:11}},grid:{display:false},border:{display:false}},y:{ticks:{color:tc2,font:{size:11,family:'DM Mono'}},grid:{color:gc},border:{display:false}}}}});
+  } catch(e){ console.error(e); }
+}
+
+// ── INSIGHT ENGINE ──
+async function loadInsights(){
+  document.getElementById('insightGrid').innerHTML = '<div class="loading" style="grid-column:1/-1"><span class="spin"></span> Clustering complaints…</div>';
+  try {
+    const [clusters, cats] = await Promise.all([
+      fetch(`${API}/insights/clusters`,{headers:headers()}).then(r=>r.json()),
+      fetch(`${API}/analytics/by-category`,{headers:headers()}).then(r=>r.json()),
+    ]);
+    const COLORS = [['#F87171','var(--cbg)'],['#F5A623','var(--abg)'],['#34D399','var(--gbg)'],['#60A5FA','var(--bbg)'],['#C084FC','var(--pbg)']];
+    const icons = ['🔴','🟡','🟢','🔵','🟣'];
+    document.getElementById('insightGrid').innerHTML = (clusters.clusters||[]).map((cl,i)=>{
+      const [fg,bg] = COLORS[i%COLORS.length];
+      return `<div class="iec" onclick="toast('Cluster ${cl.cluster_id}','${cl.root_cause}','a')">
+        <div class="iec-top"><div class="iec-icon" style="background:${bg}">${icons[i]}</div><div class="iec-title">Cluster ${cl.cluster_id} — ${cl.size} complaints</div></div>
+        <div class="iec-count">${cl.root_cause}</div>
+        <div class="iec-bar"><div class="iec-fill" style="width:${Math.min(cl.size*10,100)}%;background:${fg}"></div></div>
+        <div class="iec-trend" style="background:${bg};color:${fg}">${cl.trend}</div>
+        <div class="iec-kws">${(cl.top_keywords||[]).map(k=>`<span class="iec-kw">${k}</span>`).join('')}</div>
+      </div>`;
+    }).join('') || '<div class="empty" style="grid-column:1/-1">Not enough data to cluster. Add more complaints first.</div>';
+    // Category bars
+    const BCOLORS = ['#F87171','#F5A623','#06B6D4','#60A5FA','#C084FC','#3D4F68'];
+    const catArr  = cats.categories;
+    const maxVal  = Math.max(...catArr.map(x=>x.count), 1);
+    document.getElementById('catBars').innerHTML = catArr.map((c,i)=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 17px;border-bottom:1px solid var(--bd)">
+        <div style="font-size:12px;color:var(--t2);width:130px;flex-shrink:0;font-weight:500">${c.name}</div>
+        <div style="flex:1;height:6px;border-radius:3px;background:var(--bg4);overflow:hidden"><div style="height:100%;border-radius:3px;background:${BCOLORS[i%BCOLORS.length]};width:${(c.count/maxVal*100).toFixed(0)}%;transition:width .8s ease"></div></div>
+        <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--t3);width:28px;text-align:right">${c.count}</div>
+      </div>`).join('');
+  } catch(e){ console.error(e); document.getElementById('insightGrid').innerHTML='<div class="empty" style="grid-column:1/-1">Failed to load clusters. Is the backend running?</div>'; }
+}
+
+// ── VIEW ROUTING ──
+function go(v,el){
+  document.querySelectorAll('.view').forEach(x=>{x.classList.remove('on');x.style.display='none';});
+  document.getElementById('v-'+v).classList.add('on');
+  document.getElementById('v-'+v).style.display='block';
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on')); el.classList.add('on');
+  const T={dash:'Overview <small>Today\'s snapshot</small>',comp:'Complaints <small>All channels</small>',ana:'Analytics <small>Trends & insights</small>',ins:'Insight Engine <small>Root cause detection</small>'};
+  document.getElementById('pt').innerHTML = T[v]||v;
+  if(v==='comp'){ loadComplaints(); updFC(); }
+  if(v==='ana')  loadAnalytics();
+  if(v==='ins')  loadInsights();
+}
+
+// ── CMD PALETTE ──
+const CA = [
+  {l:'Go to Overview',       s:'Navigate', i:'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z',                           c:'var(--amber)', bg:'var(--abg)', fn:()=>go('dash',document.getElementById('n-dash'))},
+  {l:'Go to Complaints',     s:'Navigate', i:'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',               c:'var(--teal)',  bg:'var(--tbg)', fn:()=>go('comp',document.getElementById('n-comp'))},
+  {l:'Go to Analytics',      s:'Navigate', i:'M22 12h-4l-3 9L9 3l-3 9H2',                                               c:'var(--purple)',bg:'var(--pbg)', fn:()=>go('ana',document.getElementById('n-ana'))},
+  {l:'Go to Insight Engine', s:'Navigate', i:'M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z',  c:'var(--coral)', bg:'var(--cbg)', fn:()=>go('ins',document.getElementById('n-ins'))},
+  {l:'New complaint',        s:'Action',   i:'M12 5v14M5 12h14',                                                        c:'var(--amber)', bg:'var(--abg)', fn:()=>openModal()},
+  {l:'Refresh data',         s:'Action',   i:'M1 4v6h6M23 20v-6h-6',                                                    c:'var(--green)', bg:'var(--gbg)', fn:()=>loadAll()},
+];
+
+function openCmd(){ document.getElementById('cmd').classList.add('open'); document.getElementById('cInput').value=''; cSearch(); setTimeout(()=>document.getElementById('cInput').focus(),40); }
+function closeCmd(){ document.getElementById('cmd').classList.remove('open'); }
+function cSearch(){
+  const q = document.getElementById('cInput').value.toLowerCase();
+  const M = q ? complaints.filter(c=>[c.customer_name,c.ticket_id,c.product,c.issue_text].some(s=>s.toLowerCase().includes(q))).slice(0,4) : [];
+  const A = q ? CA.filter(a=>a.l.toLowerCase().includes(q)) : CA;
+  let h = '';
+  if(M.length){ h+=`<div class="cmd-sec">Complaints</div>`; h+=M.map(c=>`<div class="cmd-item" onclick="selFromCmd('${c.ticket_id}')"><div class="cii" style="background:${sevBg(c.severity)};color:${sevFg(c.severity)}">${initials(c.customer_name)}</div><div class="cib"><div class="cib-l">${c.customer_name} — ${c.ticket_id}</div><div class="cib-s">${c.issue_text.slice(0,55)}…</div></div><span class="badge b-${c.severity}">${c.severity}</span></div>`).join(''); }
+  if(A.length){ h+=`<div class="cmd-sec">Actions</div>`; h+=A.map((a,i)=>`<div class="cmd-item${i===0&&!M.length?' hi':''}" onclick="runCmd(${CA.indexOf(a)})"><div class="cii" style="background:${a.bg};color:${a.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="${a.i}"/></svg></div><div class="cib"><div class="cib-l">${a.l}</div><div class="cib-s">${a.s}</div></div></div>`).join(''); }
+  document.getElementById('cList').innerHTML = h || '<div style="padding:20px;text-align:center;color:var(--t3);font-size:13px">No results</div>';
+}
+function cKey(e){ if(e.key==='Escape') closeCmd(); if(e.key==='Enter'){ const h=document.querySelector('.cmd-item.hi'); if(h)h.click(); } }
+function runCmd(i){ closeCmd(); CA[i].fn(); }
+function selFromCmd(id){ closeCmd(); go('comp',document.getElementById('n-comp')); setTimeout(()=>sel(id),80); }
+
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){ e.preventDefault(); openCmd(); return; }
+  if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA') return;
+  if(e.key==='j'){ const ids=complaints.map(c=>c.ticket_id),i=ids.indexOf(selId); if(i<ids.length-1) sel(ids[i+1]); }
+  if(e.key==='k'){ const ids=complaints.map(c=>c.ticket_id),i=ids.indexOf(selId); if(i>0) sel(ids[i-1]); }
+  if(e.key==='Escape') closeCmd();
+});
+
+// ── TYPEWRITER ──
+function typeW(text,el,spd=14){
+  if(!el) return; el.innerHTML=''; let i=0;
+  el.innerHTML='<span class="cursor"></span>';
+  const cur=el.querySelector('.cursor');
+  const t=()=>{ if(i<text.length){ el.insertBefore(document.createTextNode(text[i++]),cur); setTimeout(t,spd); } else cur.style.display='none'; };
+  setTimeout(t,80);
+}
+
+// ── TOAST ──
+function toast(title,msg,type='a'){
+  const m={'a':'ta','g':'tg','c':'tc','b':'tb'};
+  const stack=document.getElementById('ts');
+  const t=document.createElement('div');
+  t.className=`toast ${m[type]||'ta'}`;
+  t.innerHTML=`<div class="tt">${title}</div><div class="tm">${msg}</div>`;
+  stack.appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('in')));
+  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),280); },4000);
+}
+
+// ── HELPERS ──
+const SEV_COLORS = {critical:['#F87171','#F8717118'],high:['#F87171','#F8717114'],medium:['#F5A623','#F5A62314'],low:['#34D399','#34D39914']};
+function sevFg(s){ return (SEV_COLORS[s]||['#7D8FA8','#7D8FA814'])[0]; }
+function sevBg(s){ return (SEV_COLORS[s]||['#7D8FA8','#7D8FA814'])[1]; }
+function initials(name){ return name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase(); }
+function sentEmoji(s){ return {angry:'😡',neutral:'😐',satisfied:'😊'}[s]||'😐'; }
+function slaClass(mins){ if(mins===0) return 'dn'; if(mins<60) return 'u'; if(mins<240) return 'w'; return 'ok'; }
+function slaLabel(mins, status){ if(status==='resolved') return '✓ Done'; if(mins===0) return 'Breached'; if(mins<60) return mins+'m'; return Math.floor(mins/60)+'h '+(mins%60)+'m'; }
+function slaColor(mins,status){ if(status==='resolved') return 'var(--t3)'; if(mins<60) return 'var(--coral)'; if(mins<240) return 'var(--amber)'; return 'var(--t3)'; }
+function slaBar(mins,sla_hours){ const max=sla_hours*60; return Math.min(100,(1-mins/max)*100); }
+function timeAgo(iso){
+  const diff = (Date.now()-new Date(iso))/1000;
+  if(diff<60)    return 'just now';
+  if(diff<3600)  return Math.floor(diff/60)+'m ago';
+  if(diff<86400) return Math.floor(diff/3600)+'h ago';
+  return Math.floor(diff/86400)+'d ago';
+}
+
+// ── AUTO REFRESH every 30s ──
+setInterval(()=>{ if(document.getElementById('v-comp')?.classList.contains('on')) loadComplaints(); }, 30000);
+
+// ── INIT ──
+document.getElementById('lemail').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('lpass').focus(); });
+document.getElementById('lpass').addEventListener('keydown',  e=>{ if(e.key==='Enter') doLogin(); });
+setTimeout(()=> toast('TrustDesk','Connect to http://localhost:8000 · Login to begin','b'), 600);
+</script>
+</body>
+</html>
