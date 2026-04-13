@@ -1,7 +1,5 @@
 # TrustDesk — AI Complaint Intelligence System
 <img width="1911" height="922" alt="image" src="https://github.com/user-attachments/assets/2c655d9d-f6b0-4947-8ed6-4434d610d125" />
-<img width="1890" height="916" alt="image" src="https://github.com/user-attachments/assets/37e98370-5877-41ec-8468-47eb5496cde7" />
-
 
 Full-stack complaint management platform with:
 - FastAPI backend + SQLite database
@@ -12,6 +10,8 @@ Full-stack complaint management platform with:
 - Command palette (⌘K)
 - JWT authentication
 - Insight Engine (complaint clustering)
+
+<img width="1890" height="916" alt="image" src="https://github.com/user-attachments/assets/37e98370-5877-41ec-8468-47eb5496cde7" />
 
 ---
 
@@ -140,8 +140,6 @@ trustdesk/
 - **Charts:** Chart.js 4.4
 
 ---
-
-Built for PSBs Hackathon 2026 · PS-05 · TrustDesk Team
 
 
 
