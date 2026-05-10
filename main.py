@@ -100,10 +100,10 @@ def init_db():
     if not db.query(AgentModel).first():
         pwd = CryptContext(schemes=["bcrypt"])
         agents = [
-            AgentModel(name="Arjun Kumar",   email="arjun@sbi.com",   password_hash=pwd.hash("password"), role="admin",      branch="Mumbai HQ"),
-            AgentModel(name="Priya Sharma",  email="priya@sbi.com",   password_hash=pwd.hash("password"), role="supervisor", branch="Delhi"),
-            AgentModel(name="Rahul Gupta",   email="rahul@sbi.com",   password_hash=pwd.hash("password"), role="agent",      branch="Patna"),
-            AgentModel(name="Sneha Mishra",  email="sneha@sbi.com",   password_hash=pwd.hash("password"), role="agent",      branch="Lucknow"),
+            AgentModel(name="Arjun Kumar",   email="arjun@sbi.com",   password_hash=pwd.hash("password"[:72]), role="admin",      branch="Mumbai HQ"),
+            AgentModel(name="Priya Sharma",  email="priya@sbi.com",   password_hash=pwd.hash("password"[:72]), role="supervisor", branch="Delhi"),
+            AgentModel(name="Rahul Gupta",   email="rahul@sbi.com",   password_hash=pwd.hash("password"[:72]), role="agent",      branch="Patna"),
+            AgentModel(name="Sneha Mishra",  email="sneha@sbi.com",   password_hash=pwd.hash("password"[:72]), role="agent",      branch="Lucknow"),
         ]
         db.add_all(agents)
         # Seed sample complaints
