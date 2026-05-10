@@ -100,10 +100,10 @@ def init_db():
     if not db.query(AgentModel).first():
         
         agents = [
-            AgentModel(name="Arjun Kumar",   email="arjun@sbi.com",   password_hash=pwd.hash("password"[:72]), role="admin",      branch="Mumbai HQ"),
-            AgentModel(name="Priya Sharma",  email="priya@sbi.com",   password_hash=pwd.hash("password"[:72]), role="supervisor", branch="Delhi"),
-            AgentModel(name="Rahul Gupta",   email="rahul@sbi.com",   password_hash=pwd.hash("password"[:72]), role="agent",      branch="Patna"),
-            AgentModel(name="Sneha Mishra",  email="sneha@sbi.com",   password_hash=pwd.hash("password"[:72]), role="agent",      branch="Lucknow"),
+            AgentModel(name="Arjun Kumar",   email="arjun@sbi.com",   password_hash=hash_password("password"), role="admin",      branch="Mumbai HQ"),
+            AgentModel(name="Priya Sharma",  email="priya@sbi.com",   password_hash=hash_password("password"), role="supervisor", branch="Delhi"),
+            AgentModel(name="Rahul Gupta",   email="rahul@sbi.com",   password_hash=hash_password("password"), role="agent",      branch="Patna"),
+            AgentModel(name="Sneha Mishra",  email="sneha@sbi.com",   password_hash=hash_password("password"), role="agent",      branch="Lucknow"),
         ]
         db.add_all(agents)
         # Seed sample complaints
@@ -128,8 +128,19 @@ def init_db():
 # ─────────────────────────────────────────────
 
 
-def verify_password(plain, hashed):  return pwd_ctx.verify(plain, hashed)
-def hash_password(password):         return pwd_ctx.hash(password)
+def hash_password(password):
+    password = password[:72]
+    return bcrypt.hashpw(
+        password.encode('utf-8'),
+        bcrypt.gensalt()
+    ).decode('utf-8')
+
+def verify_password(plain, hashed):
+    plain = plain[:72]
+    return bcrypt.checkpw(
+        plain.encode('utf-8'),
+        hashed.encode('utf-8')
+    )
 def create_token(data: dict):
     exp = datetime.utcnow() + timedelta(minutes=TOKEN_EXPIRE_MINS)
     return jwt.encode({**data, "exp": exp}, SECRET_KEY, algorithm=ALGORITHM)
