@@ -29,7 +29,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, 
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 
 # ─────────────────────────────────────────────
 #  CONFIG  (replace API key here or set env var)
@@ -98,7 +98,7 @@ def init_db():
     db = Session_()
     # Seed default agents if none exist
     if not db.query(AgentModel).first():
-        pwd = CryptContext(schemes=["bcrypt"])
+        
         agents = [
             AgentModel(name="Arjun Kumar",   email="arjun@sbi.com",   password_hash=pwd.hash("password"[:72]), role="admin",      branch="Mumbai HQ"),
             AgentModel(name="Priya Sharma",  email="priya@sbi.com",   password_hash=pwd.hash("password"[:72]), role="supervisor", branch="Delhi"),
@@ -126,7 +126,7 @@ def init_db():
 # ─────────────────────────────────────────────
 #  AUTH
 # ─────────────────────────────────────────────
-pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def verify_password(plain, hashed):  return pwd_ctx.verify(plain, hashed)
 def hash_password(password):         return pwd_ctx.hash(password)
